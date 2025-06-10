@@ -1,0 +1,9 @@
+server:
+  port: 8080
+
+dvp:
+  banner: true
+  api-key: YOUR_API_KEY
+  endpoint: YOUR_CLUSTER_ENDPOINT
+  packages-scan:
+    - com.example.entity

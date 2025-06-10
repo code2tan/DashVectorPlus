@@ -1,0 +1,3 @@
+code2t.com.dvp.log.spi.LogbackAdapter
+code2t.com.dvp.log.spi.Log4j2Adapter
+code2t.com.dvp.log.spi.JulAdapter

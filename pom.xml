@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>code2t.com</groupId>
+    <artifactId>DashVectorPlus</artifactId>
+    <version>0.0.1</version>
+
+    <name>DashVectorPlus :: Aggregator</name>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>dash-vector-plus-parent</module>
+        <module>dash-vector-plus-core</module>
+        <module>dash-vector-plus-boot-starter</module>
+    </modules>
+
+</project>
