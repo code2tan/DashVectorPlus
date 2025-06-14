@@ -8,7 +8,6 @@ import code2t.com.dvp.toolkits.DVCollectionToolkits;
 import com.aliyun.dashvector.DashVectorClient;
 import com.aliyun.dashvector.DashVectorClientConfig;
 import com.aliyun.dashvector.models.requests.CreateCollectionRequest;
-import com.aliyun.dashvector.models.responses.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +17,7 @@ import static code2t.com.dvp.toolkits.ValidationToolkits.ensureNotBlank;
 import static code2t.com.dvp.toolkits.ValidationToolkits.ensureNotEmpty;
 
 @Slf4j
-public class AbstractClientBuilder implements ClusterManageService, ClientBuilder {
+public class AbstractClientBuilder implements CollectionManageService {
     /**
      * 客户端配置信息
      */
@@ -78,17 +77,17 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
         for (Class<?> annotatedClass : annotatedClasses) {
             String collectionName = DVCollectionToolkits.parseCollectionName(annotatedClass);
             if (DashVectorCollectionCache.exist(collectionName)) {
-                log.info("Create collection [{}] using local cache", annotatedClass.getName());
+                log.info("Create collection [{}] using local cache", DVCollectionToolkits.parseCollectionName(annotatedClass));
                 continue;
             }
             CreateCollectionRequest collectionRequest = DashVectorConverter.convertCollection(annotatedClass);
 
-            Response<Void> response = client.create(collectionRequest);
+            Boolean response = create(collectionRequest);
             // update cache
-            if (response.isSuccess()) {
-                DashVectorCollectionCache.put(collectionRequest.getName(), client.get(collectionRequest.getName()));
+            if (response) {
+                DashVectorCollectionCache.put(collectionRequest.getName(), get(collectionRequest.getName()));
             }
-            log.info("create dash vector collection -> {} response {}", collectionRequest.getName(), response.getMessage());
+            log.info("create dash vector collection -> {} response {}", collectionRequest.getName(), response);
         }
     }
 }
