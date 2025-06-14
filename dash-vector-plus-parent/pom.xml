@@ -17,7 +17,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <spring.version>3.4.5</spring.version>
         <lombok.version>1.18.38</lombok.version>
-        <dashvector.version>1.0.12</dashvector.version>
+        <dashvector.version>1.0.18</dashvector.version>
         <auto.service.version>1.0</auto.service.version>
     </properties>
     <dependencyManagement>

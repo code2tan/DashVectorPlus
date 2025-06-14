@@ -99,11 +99,12 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
                 return;
             }
 
-            List<CreateCollectionRequest> collectionRequests = DashVectorConverter.convert(annotatedClass);
-            collectionRequests.forEach(collectionRequest -> {
-                Response<Void> response = client.create(collectionRequest);
-                log.info("create dash vector collection {} {}", collectionRequest.getName(), response.getMessage());
-            });
+            CreateCollectionRequest collectionRequest = DashVectorConverter.convert(annotatedClass);
+            if (collectionRequest == null) {
+                continue;
+            }
+            Response<Void> response = client.create(collectionRequest);
+            log.info("create dash vector collection {} {}", collectionRequest.getName(), response.getMessage());
         }
     }
 }

@@ -14,12 +14,12 @@ public @interface DVFieldSchema {
     /**
      * 字段名字
      */
-    String name();
+    String name() default "";
 
     /**
      * Field类型
      */
-    FieldType  fieldType() default FieldType.UNRECOGNIZED;
+    FieldType fieldType() default FieldType.UNRECOGNIZED;
 
     boolean require() default true;
 }
