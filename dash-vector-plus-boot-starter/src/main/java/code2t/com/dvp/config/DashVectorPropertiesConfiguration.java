@@ -40,4 +40,9 @@ public class DashVectorPropertiesConfiguration {
      */
     private List<String> packagesScan;
 
+    /**
+     * auto init not exist collection
+     */
+    private Boolean autoInitCollection = true;
+
 }

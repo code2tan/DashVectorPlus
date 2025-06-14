@@ -27,4 +27,9 @@ public class DashVectorProperties {
      * anno scan path
      */
     private List<String> packagesScan;
+
+    /**
+     * auto init not exist collection
+     */
+    private Boolean autoInitCollection = true;
 }

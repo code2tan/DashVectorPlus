@@ -63,9 +63,14 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
             return;
         }
 
-        performBusinessLogic(classes);
+        if (properties.getAutoInitCollection()) {
+            initCollection(classes);
+        }
     }
 
+    /**
+     * init collection cache
+     */
     private void initCache() {
         Response<List<String>> response = client.list();
         if (!response.isSuccess()) {
@@ -87,7 +92,12 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
 
     }
 
-    public void performBusinessLogic(List<Class<?>> annotatedClasses) {
+    /**
+     * init not exist collection
+     *
+     * @param annotatedClasses the collection object
+     */
+    public void initCollection(List<Class<?>> annotatedClasses) {
         for (Class<?> annotatedClass : annotatedClasses) {
             if (DashVectorCollectionCache.exists(annotatedClass.getName())) {
                 continue;
