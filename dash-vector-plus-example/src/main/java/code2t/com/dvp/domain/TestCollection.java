@@ -3,13 +3,15 @@ package code2t.com.dvp.domain;
 
 import code2t.com.dvp.anno.DVCollection;
 import code2t.com.dvp.anno.DVFieldSchema;
+import code2t.com.dvp.anno.DVPartition;
 import com.aliyun.dashvector.proto.FieldType;
 import lombok.Data;
 
 import java.util.Map;
 
 @Data
-@DVCollection(name = "test_collection", dimension = 1024)
+@DVCollection(name = "test_collection_1", dimension = 1024)
+@DVPartition(name = {"p"})
 public class TestCollection {
 
     @DVFieldSchema(name = "test_id")

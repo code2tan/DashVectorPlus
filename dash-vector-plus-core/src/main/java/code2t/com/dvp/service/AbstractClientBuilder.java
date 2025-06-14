@@ -2,8 +2,10 @@ package code2t.com.dvp.service;
 
 import code2t.com.dvp.cache.DashVectorCache;
 import code2t.com.dvp.cache.DashVectorCollectionCache;
+import code2t.com.dvp.converter.ActionType;
 import code2t.com.dvp.converter.DashVectorConverter;
 import code2t.com.dvp.models.DashVectorProperties;
+import code2t.com.dvp.models.req.CreatePartitionRequest;
 import code2t.com.dvp.toolkits.ClassToolkits;
 import com.aliyun.dashvector.DashVectorClient;
 import com.aliyun.dashvector.DashVectorClientConfig;
@@ -14,6 +16,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -92,6 +95,7 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
 
     }
 
+
     /**
      * init not exist collection
      *
@@ -109,12 +113,32 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
                 return;
             }
 
-            CreateCollectionRequest collectionRequest = DashVectorConverter.convert(annotatedClass);
-            if (collectionRequest == null) {
-                continue;
+            Map<ActionType, Object> handlerContext = DashVectorConverter.convert(annotatedClass);
+            // init collection
+            if (handlerContext.containsKey(ActionType.COLLECTION)) {
+                CreateCollectionRequest collectionRequest = (CreateCollectionRequest) handlerContext.get(ActionType.COLLECTION);
+                Response<Void> response = client.create(collectionRequest);
+
+                log.info("create dash vector collection -> {} response {}", collectionRequest.getName(), response.getMessage());
+
+                // init partition
+                if (handlerContext.containsKey(ActionType.PARTITION)) {
+                    CreatePartitionRequest createPartitionRequest = (CreatePartitionRequest) handlerContext.get(ActionType.PARTITION);
+                    DashVectorCollection collection = client.get(collectionRequest.getName());
+
+                    createPartitionRequest.getPartitionName()
+                            .forEach(partitionName -> {
+                                Response<Void> responseP = collection.createPartition(partitionName);
+                                log.info("create dash vector collection {} partition -> {} response -> {}",
+                                        collectionRequest.getName(), partitionName, responseP.getMessage());
+                            });
+                }
             }
-            Response<Void> response = client.create(collectionRequest);
-            log.info("create dash vector collection {} {}", collectionRequest.getName(), response.getMessage());
+
         }
+    }
+
+    private void initPartition() {
+
     }
 }

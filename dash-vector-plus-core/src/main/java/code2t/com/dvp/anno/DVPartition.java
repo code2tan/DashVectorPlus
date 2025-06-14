@@ -1,7 +1,5 @@
 package code2t.com.dvp.anno;
 
-import com.aliyun.dashvector.proto.CollectionInfo;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,28 +14,11 @@ public @interface DVPartition {
     String[] name();
 
     /**
-     * 向量维度
+     * timeout == null：接口开启同步，待Collection 创建成功后返回
+     * <p>
+     * timeout == -1：接口开启异步
+     * <p>
+     * timeout >= 0：接口开启同步并等待，若规定时间Collection未创建成功，则返回超时
      */
-    int dimension();
-
-    /**
-     * 向量数据类型，支持
-     * <li>DataType.INT</li>
-     * <li>DataType.FLOAT</li>
-     */
-    CollectionInfo.DataType dataType();
-
-    /**
-     * 距离度量
-     * <li>Metric.cosine</li>
-     * <li>Metric.euclidean</li>
-     * <li>Metric.dotproduct</li>
-     */
-    CollectionInfo.Metric metric();
-
-    /**
-     * <li>timeout == -1：接口开启异步</li>
-     * <li>timeout >= 0：接口开启同步并等待，若规定时间Collection未创建成功，则返回超时</li>
-     */
-    int timeout() default 0;
+    int timeout() default -1;
 }
