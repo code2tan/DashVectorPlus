@@ -1,6 +1,6 @@
 package code2t.com.dvp.converter;
 
-import code2t.com.dvp.anno.DashVectorCollection;
+import code2t.com.dvp.anno.DVCollection;
 import com.aliyun.dashvector.models.requests.CreateCollectionRequest;
 
 import java.lang.annotation.Annotation;
@@ -17,17 +17,17 @@ public class DashVectorConverter {
 
         Map<? extends Class<? extends Annotation>, Set<Annotation>> annotationMap = Arrays.stream(annotations)
                 .collect(Collectors.groupingBy(Annotation::annotationType, Collectors.toSet()));
-        Set<Annotation> dashVectorCollections = annotationMap.get(DashVectorCollection.class);
+        Set<Annotation> DVCollections = annotationMap.get(DVCollection.class);
 
-        return dashVectorCollections.stream()
+        return DVCollections.stream()
                 .map(annotation -> {
-                    DashVectorCollection dashVectorCollection = (DashVectorCollection) annotation;
+                    DVCollection DVCollection = (DVCollection) annotation;
                     return CreateCollectionRequest.builder()
-                            .name(dashVectorCollection.name())
-                            .dimension(dashVectorCollection.dimension())
-                            .dataType(dashVectorCollection.dataType())
-                            .metric(dashVectorCollection.metric())
-                            .timeout(dashVectorCollection.timeout())
+                            .name(DVCollection.name())
+                            .dimension(DVCollection.dimension())
+                            .dataType(DVCollection.dataType())
+                            .metric(DVCollection.metric())
+                            .timeout(DVCollection.timeout())
                             .build();
 
                 }).toList();

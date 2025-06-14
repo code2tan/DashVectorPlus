@@ -20,7 +20,7 @@ public class LambdaInsertWrapper<T> extends AbstractChainWrapper<T> {
     private DashVectorResp<List<DocOpResult>> insert(List<Object> param) {
         // return executeWithBackoffRetry(
         //         () -> {
-        //             DashVectorCollection collection = client.get(collectionName);
+        //             DVCollection collection = client.get(collectionName);
         //             // todo Response<List<DocOpResult>> response = collection.insert();
         //             Response<List<DocOpResult>> response = collection.insert(null);
         //

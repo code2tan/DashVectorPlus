@@ -1,6 +1,6 @@
 package code2t.com.dvp.core.mapper;
 
-import code2t.com.dvp.anno.DashVectorCollection;
+import code2t.com.dvp.anno.DVCollection;
 import code2t.com.dvp.cache.DashVectorCache;
 import code2t.com.dvp.core.conditions.Wrapper;
 import code2t.com.dvp.service.AbstractClientBuilder;
@@ -34,8 +34,8 @@ public abstract class BaseMapper<T> extends AbstractClientBuilder {
      */
     public <W> W lambda(Wrapper<W, T> wrapper, Class<T> entityType) {
         // 从实体类上获取@DashVectorCollection注解
-        ensureNotNull(entityType.getAnnotation(DashVectorCollection.class),
-                "Entity type %s is not annotated with @DashVectorCollection.",
+        ensureNotNull(entityType.getAnnotation(DVCollection.class),
+                "Entity type %s is not annotated with @DVCollection.",
                 entityType.getName());
 
         // 初始化构建器实例

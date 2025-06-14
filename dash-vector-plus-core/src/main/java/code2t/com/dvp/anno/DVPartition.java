@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DashVectorPartition {
+public @interface DVPartition {
     /**
      * 分区的名称
      */

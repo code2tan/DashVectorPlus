@@ -1,6 +1,6 @@
 package code2t.com.dvp.toolkits;
 
-import code2t.com.dvp.anno.DashVectorCollection;
+import code2t.com.dvp.anno.DVCollection;
 import code2t.com.dvp.exception.Exceptions;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -60,7 +60,7 @@ public class ClassToolkits {
             var reader = readerFactory.getMetadataReader(resource);
             var className = reader.getClassMetadata().getClassName();
             var clazz = Class.forName(className);
-            return clazz.isAnnotationPresent(DashVectorCollection.class)
+            return clazz.isAnnotationPresent(DVCollection.class)
                     ? Optional.of(clazz)
                     : Optional.empty();
         } catch (ClassNotFoundException e) {
