@@ -32,4 +32,5 @@ public class DashVectorProperties {
      * auto init not exist collection
      */
     private Boolean autoInitCollection = true;
+    private Boolean autoInitpartition = true;
 }

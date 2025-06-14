@@ -1,13 +1,14 @@
 package code2t.com.dvp.converter.handler;
 
 import code2t.com.dvp.anno.DVFieldSchema;
-import code2t.com.dvp.converter.DashVectorHandlerContext;
+import code2t.com.dvp.converter.CollectionAnnoHandler;
+import com.aliyun.dashvector.models.requests.CreateCollectionRequest;
 import com.aliyun.dashvector.proto.FieldType;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class DVFieldSchemaAnnoHandler implements AnnotationHandler {
+public class DVFieldSchemaAnnoHandler implements CollectionAnnoHandler {
     List<DVFieldSchema> fieldSchemas = new ArrayList<>();
     List<Field> fields = new ArrayList<>();
 
@@ -29,16 +30,14 @@ public class DVFieldSchemaAnnoHandler implements AnnotationHandler {
         return fieldSchemas.isEmpty();
     }
 
-
     /**
      * 处理注解业务逻辑
      *
-     * @param context     处理上下文（包含构建器等）
+     * @param builder     CreateCollectionRequest builder
      * @param entityClass 要处理的类
      */
     @Override
-    public void handle(DashVectorHandlerContext context,
-                       Class<?> entityClass) {
+    public void handle(CreateCollectionRequest.CreateCollectionRequestBuilder builder, Class<?> entityClass) {
         Map<String, FieldType> filedSchemaMap = new HashMap<>();
 
         for (Field classField : fields) {
@@ -53,8 +52,7 @@ public class DVFieldSchemaAnnoHandler implements AnnotationHandler {
                     });
 
         }
-        context.getCollectionRequestBuilder()
-                .filedsSchema(filedSchemaMap);
+        builder.filedsSchema(filedSchemaMap);
     }
 
 

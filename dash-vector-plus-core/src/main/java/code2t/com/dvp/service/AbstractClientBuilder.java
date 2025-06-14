@@ -1,24 +1,18 @@
 package code2t.com.dvp.service;
 
-import code2t.com.dvp.cache.DashVectorCache;
 import code2t.com.dvp.cache.DashVectorCollectionCache;
-import code2t.com.dvp.converter.ActionType;
 import code2t.com.dvp.converter.DashVectorConverter;
 import code2t.com.dvp.models.DashVectorProperties;
-import code2t.com.dvp.models.req.CreatePartitionRequest;
 import code2t.com.dvp.toolkits.ClassToolkits;
+import code2t.com.dvp.toolkits.DVCollectionToolkits;
 import com.aliyun.dashvector.DashVectorClient;
 import com.aliyun.dashvector.DashVectorClientConfig;
-import com.aliyun.dashvector.DashVectorCollection;
 import com.aliyun.dashvector.models.requests.CreateCollectionRequest;
 import com.aliyun.dashvector.models.responses.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 import static code2t.com.dvp.toolkits.ValidationToolkits.ensureNotBlank;
 import static code2t.com.dvp.toolkits.ValidationToolkits.ensureNotEmpty;
@@ -34,7 +28,7 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
     /**
      * 客户端
      */
-    DashVectorClient client;
+    protected DashVectorClient client;
 
     @Override
     public DashVectorClient getClient() {
@@ -52,12 +46,12 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
                 .timeout(properties.getTimeout())
                 .build();
         client = new DashVectorClient(config);
+        DashVectorCollectionCache.init(client);
         postProcess();
     }
 
 
     public void postProcess() {
-        initCache();
         List<Class<?>> classes = ClassToolkits.getClass(
                 ensureNotEmpty(properties.getPackagesScan(), "packageScan")
         );
@@ -69,30 +63,9 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
         if (properties.getAutoInitCollection()) {
             initCollection(classes);
         }
-    }
-
-    /**
-     * init collection cache
-     */
-    private void initCache() {
-        Response<List<String>> response = client.list();
-        if (!response.isSuccess()) {
-            log.warn("failed to init dash vector cache [{}]", response.getMessage());
-            return;
+        if (properties.getAutoInitpartition()) {
+            // initPartition(classes);
         }
-
-        if (response.isSuccess()) {
-            List<CompletableFuture<DashVectorCollection>> futures = response.getOutput().stream()
-                    .map(collectionName -> CompletableFuture.supplyAsync(() -> client.get(collectionName)))
-                    .toList();
-
-            List<DashVectorCollection> collectionList = futures.stream()
-                    .map(CompletableFuture::join)
-                    .toList();
-
-            DashVectorCollectionCache.init(collectionList);
-        }
-
     }
 
 
@@ -103,42 +76,19 @@ public class AbstractClientBuilder implements ClusterManageService, ClientBuilde
      */
     public void initCollection(List<Class<?>> annotatedClasses) {
         for (Class<?> annotatedClass : annotatedClasses) {
-            if (DashVectorCollectionCache.exists(annotatedClass.getName())) {
+            String collectionName = DVCollectionToolkits.parseCollectionName(annotatedClass);
+            if (DashVectorCollectionCache.exist(collectionName)) {
+                log.info("Create collection [{}] using local cache", annotatedClass.getName());
                 continue;
             }
-            DashVectorCache.ConversionCache conversionCache = DashVectorCache.get(annotatedClass.getName());
+            CreateCollectionRequest collectionRequest = DashVectorConverter.convertCollection(annotatedClass);
 
-            if (Objects.nonNull(conversionCache)) {
-                log.info("Create collection [{}] using conversion cache", annotatedClass.getName());
-                return;
+            Response<Void> response = client.create(collectionRequest);
+            // update cache
+            if (response.isSuccess()) {
+                DashVectorCollectionCache.put(collectionRequest.getName(), client.get(collectionRequest.getName()));
             }
-
-            Map<ActionType, Object> handlerContext = DashVectorConverter.convert(annotatedClass);
-            // init collection
-            if (handlerContext.containsKey(ActionType.COLLECTION)) {
-                CreateCollectionRequest collectionRequest = (CreateCollectionRequest) handlerContext.get(ActionType.COLLECTION);
-                Response<Void> response = client.create(collectionRequest);
-
-                log.info("create dash vector collection -> {} response {}", collectionRequest.getName(), response.getMessage());
-
-                // init partition
-                if (handlerContext.containsKey(ActionType.PARTITION)) {
-                    CreatePartitionRequest createPartitionRequest = (CreatePartitionRequest) handlerContext.get(ActionType.PARTITION);
-                    DashVectorCollection collection = client.get(collectionRequest.getName());
-
-                    createPartitionRequest.getPartitionName()
-                            .forEach(partitionName -> {
-                                Response<Void> responseP = collection.createPartition(partitionName);
-                                log.info("create dash vector collection {} partition -> {} response -> {}",
-                                        collectionRequest.getName(), partitionName, responseP.getMessage());
-                            });
-                }
-            }
-
+            log.info("create dash vector collection -> {} response {}", collectionRequest.getName(), response.getMessage());
         }
-    }
-
-    private void initPartition() {
-
     }
 }

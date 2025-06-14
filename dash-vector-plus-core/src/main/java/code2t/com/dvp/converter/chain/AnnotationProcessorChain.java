@@ -1,13 +1,13 @@
-package code2t.com.dvp.converter;
+package code2t.com.dvp.converter.chain;
 
-import code2t.com.dvp.converter.handler.AnnotationHandler;
+import code2t.com.dvp.converter.CollectionAnnoHandler;
+import com.aliyun.dashvector.models.requests.CreateCollectionRequest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class AnnotationProcessorChain {
-    private final List<AnnotationHandler> handlers = new ArrayList<>();
+    private final List<CollectionAnnoHandler> handlers = new ArrayList<>();
 
     /**
      * Add processor to the chain
@@ -15,7 +15,7 @@ public class AnnotationProcessorChain {
      * @param handler Annotation handler
      * @return AnnotationProcessorChain
      */
-    public AnnotationProcessorChain addHandler(AnnotationHandler handler) {
+    public AnnotationProcessorChain addHandler(CollectionAnnoHandler handler) {
         handlers.add(handler);
         return this;
     }
@@ -26,14 +26,13 @@ public class AnnotationProcessorChain {
      * @param entityClass entityClass
      * @return CreateCollectionRequest
      */
-    public Map<ActionType, Object> process(Class<?> entityClass) {
-
-        DashVectorHandlerContext dashVectorHandlerContext = new DashVectorHandlerContext();
+    public CreateCollectionRequest process(Class<?> entityClass) {
+        CreateCollectionRequest.CreateCollectionRequestBuilder builder = CreateCollectionRequest.builder();
         handlers.stream()
                 .filter(handler -> handler.supports(entityClass))
                 .forEach(handler -> {
-                    handler.handle(dashVectorHandlerContext, entityClass);
+                    handler.handle(builder, entityClass);
                 });
-        return dashVectorHandlerContext.finish();
+        return builder.build();
     }
 }

@@ -17,7 +17,7 @@ public @interface DVCollection {
     /**
      * 集合的名称
      */
-    String name();
+    String name() default "";
 
     /**
      * 向量维度
