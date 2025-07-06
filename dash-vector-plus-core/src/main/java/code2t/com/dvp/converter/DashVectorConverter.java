@@ -1,35 +1,28 @@
 package code2t.com.dvp.converter;
 
-import code2t.com.dvp.anno.DashVectorCollection;
+import code2t.com.dvp.converter.chain.AnnotationProcessorChain;
+import code2t.com.dvp.converter.handler.DVCollectionAnnoHandler;
+import code2t.com.dvp.converter.handler.DVFieldSchemaAnnoHandler;
+import code2t.com.dvp.converter.handler.DVPartitionAnnoHandler;
+import code2t.com.dvp.models.req.CreatePartitionRequest;
 import com.aliyun.dashvector.models.requests.CreateCollectionRequest;
-
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DashVectorConverter {
 
-    public static List<CreateCollectionRequest> convert(Class<?> entityClass) {
-        Annotation[] annotations = entityClass.getAnnotations();
+    public static CreateCollectionRequest convertCollection(Class<?> entityClass) {
+        return new AnnotationProcessorChain()
+                .addHandler(new DVCollectionAnnoHandler())
+                .addHandler(new DVFieldSchemaAnnoHandler())
+                .process(entityClass);
+    }
 
-        Map<? extends Class<? extends Annotation>, Set<Annotation>> annotationMap = Arrays.stream(annotations)
-                .collect(Collectors.groupingBy(Annotation::annotationType, Collectors.toSet()));
-        Set<Annotation> dashVectorCollections = annotationMap.get(DashVectorCollection.class);
+    public static CreatePartitionRequest convertPartition(Class<?> entityClass) {
+        DVPartitionAnnoHandler dvPartitionAnnoHandler = new DVPartitionAnnoHandler();
 
-        return dashVectorCollections.stream()
-                .map(annotation -> {
-                    DashVectorCollection dashVectorCollection = (DashVectorCollection) annotation;
-                    return CreateCollectionRequest.builder()
-                            .name(dashVectorCollection.name())
-                            .dimension(dashVectorCollection.dimension())
-                            .dataType(dashVectorCollection.dataType())
-                            .metric(dashVectorCollection.metric())
-                            .timeout(dashVectorCollection.timeout())
-                            .build();
-
-                }).toList();
+        CreatePartitionRequest.CreatePartitionRequestBuilder builder = CreatePartitionRequest.builder();
+        if (dvPartitionAnnoHandler.supports(entityClass)) {
+            dvPartitionAnnoHandler.handle(builder, entityClass);
+        }
+        return builder.build();
     }
 }

@@ -1,0 +1,6 @@
+dvp:
+  banner: true
+  api-key: sk-Vbp5GrqfScFI7QFuiEmx5WD8u1BjK391E1C2695D211EFB46482E2369D5DE4
+  endpoint: vrs-cn-9me4a4v7j0001c.dashvector.cn-shanghai.aliyuncs.com
+  packages-scan:
+    - code2t.com.dvp.domain

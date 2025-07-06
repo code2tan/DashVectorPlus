@@ -13,11 +13,11 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DashVectorCollection {
+public @interface DVCollection {
     /**
      * 集合的名称
      */
-    String name();
+    String name() default "";
 
     /**
      * 向量维度
